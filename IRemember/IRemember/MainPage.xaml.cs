@@ -141,17 +141,8 @@ namespace IRemember
                 dialog.PhotoSettings.CroppedAspectRatio = aspectRatio;
 
                 StorageFile file = await dialog.CaptureFileAsync(CameraCaptureUIMode.Photo);
-                if (file != null)
-                {
-                    bitmapimage = new BitmapImage();
-                    using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
-                    {
-                        bitmapimage.SetSource(fileStream);
-                        this.Frame.Navigate(typeof(PhotoPage), bitmapimage);
-                    }
-                    // Store the file path in Application Data
-                    appSettings[photoKey] = file.Path;
-                }
+                this.Frame.Navigate(typeof(PhotoPage), file);
+
                 
             }
             catch (Exception ex)

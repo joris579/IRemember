@@ -2,25 +2,19 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
+using Windows.Devices.Geolocation;
+using Windows.Graphics.Imaging;
 using Windows.Storage;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.Storage.AccessCache;
+using Windows.Storage.Pickers;
+using Windows.Storage.Streams;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using System.Threading.Tasks;
-using Windows.UI.Popups;
-using Windows.UI.Xaml.Media.Imaging;
-using Windows.Graphics.Imaging;
-using Windows.Storage.Streams;
-using Windows.Storage.AccessCache;
 
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
@@ -35,9 +29,11 @@ namespace IRemember
 
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
-        private BitmapImage textPassed;
+        private BitmapImage bitmapimage;
+        private WriteableBitmap wBitmap;
+        private CancellationTokenSource _cts = null;
         StorageItemAccessList m_futureAccess = StorageApplicationPermissions.FutureAccessList;
-        string m_fileToken;
+        StorageFile file;
 
         /// <summary>
         /// This can be changed to a strongly typed view model.
@@ -65,10 +61,18 @@ namespace IRemember
             this.navigationHelper.SaveState += navigationHelper_SaveState;
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
-            BitmapImage textPassed = (BitmapImage) e.Parameter;
-            Photo.Source = textPassed;
+            file = (StorageFile)e.Parameter;
+            if (file != null)
+            {
+                bitmapimage = new BitmapImage();
+                using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
+                {
+                    bitmapimage.SetSource(fileStream);
+                }
+            }
+            Photo.Source = bitmapimage;
 
         }
         /// <summary>
@@ -128,88 +132,61 @@ namespace IRemember
                 var msgBox = new MessageDialog("Please enter a Description");
                 await msgBox.ShowAsync();
             }
-            else if (Title.Text != "" && Story.Text != "")
+            else if (Title.Text != "" && Story.Text != "") //all included check.
             {
-                try
+                if (file != null)
                 {
-                    StorageFile inputFile = await m_futureAccess.GetFileAsync(m_fileToken);
-                    StorageFile outputFile = await Helpers.GetFileFromSavePickerAsync();
-                    Guid encoderId;
-
-                    switch (outputFile.FileType)
+                    using (var streamCamera = await file.OpenAsync(FileAccessMode.Read))//openin storage file
                     {
-                        case ".png":
-                            encoderId = BitmapEncoder.PngEncoderId;
-                            break;
-                        case ".bmp":
-                            encoderId = BitmapEncoder.BmpEncoderId;
-                            break;
-                        case ".jpg":
-                        default:
-                            encoderId = BitmapEncoder.JpegEncoderId;
-                            break;
-                    }
 
-                    using (IRandomAccessStream inputStream = await inputFile.OpenAsync(FileAccessMode.Read),
-                               outputStream = await outputFile.OpenAsync(FileAccessMode.ReadWrite))
-                    {
-                        // BitmapEncoder expects an empty output stream; the user may have selected a
-                        // pre-existing file.
-                        outputStream.Size = 0;
+                        BitmapImage bitmapCamera = new BitmapImage();
+                        bitmapCamera.SetSource(streamCamera); //setting as bitmap
+                        //set file sizes.
+                        int width = bitmapCamera.PixelWidth;
+                        int height = bitmapCamera.PixelHeight;
 
-                        // Get pixel data from the decoder. We apply the user-requested transforms on the
-                        // decoded pixels to take advantage of potential optimizations in the decoder.
-                        BitmapDecoder decoder = await BitmapDecoder.CreateAsync(inputStream);
-                        BitmapTransform transform = new BitmapTransform();
+                        wBitmap = new WriteableBitmap(width, height);
 
-                        // Scaling occurs before flip/rotation, therefore use the original dimensions
-                        // (no orientation applied) as parameters for scaling.
-                        transform.ScaledHeight = (uint)(decoder.PixelHeight * m_scaleFactor);
-                        transform.ScaledWidth = (uint)(decoder.PixelWidth * m_scaleFactor);
-                        transform.Rotation = Helpers.ConvertToBitmapRotation(m_userRotation);
+                        using (var stream = await file.OpenAsync(FileAccessMode.Read))
+                        {
+                            wBitmap.SetSource(stream);
+                        }
 
-                        // Fant is a relatively high quality interpolation mode.
-                        transform.InterpolationMode = BitmapInterpolationMode.Fant;
+                        //SaveImageAsJpeg(); //Save picker and save function call {TODO} TURN BACK ON!
 
-                        // The BitmapDecoder indicates what pixel format and alpha mode best match the
-                        // natively stored image data. This can provide a performance and/or quality gain.
-                        BitmapPixelFormat format = decoder.BitmapPixelFormat;
-                        BitmapAlphaMode alpha = decoder.BitmapAlphaMode;
-
-                        PixelDataProvider pixelProvider = await decoder.GetPixelDataAsync(
-                            format,
-                            alpha,
-                            transform,
-                            ExifOrientationMode.RespectExifOrientation,
-                            ColorManagementMode.ColorManageToSRgb
-                            );
-
-                        byte[] pixels = pixelProvider.DetachPixelData();
-
-                        // Write the pixel data onto the encoder. Note that we can't simply use the
-                        // BitmapTransform.ScaledWidth and ScaledHeight members as the user may have
-                        // requested a rotation (which is applied after scaling).
-                        BitmapEncoder encoder = await BitmapEncoder.CreateAsync(encoderId, outputStream);
-                        encoder.SetPixelData(
-                            format,
-                            alpha,
-                            (uint)((double)m_displayWidthNonScaled * m_scaleFactor),
-                            (uint)((double)m_displayHeightNonScaled * m_scaleFactor),
-                            decoder.DpiX,
-                            decoder.DpiY,
-                            pixels
-                            );
-
-                        await encoder.FlushAsync();
-
-                        rootPage.NotifyUser("Successfully saved a copy: " + outputFile.Name, NotifyType.StatusMessage);
+                        //get location
+                        getLocation();
                     }
                 }
-                catch (Exception err)
+            }
+        }
+
+        private async void getLocation()
+        {
+            _cts = new CancellationTokenSource();
+            CancellationToken token = _cts.Token;
+            Geolocator locator = new Geolocator();
+            Geoposition position = await locator.GetGeopositionAsync().AsTask(token);
+
+            System.Diagnostics.Debug.WriteLine("Test output" + position.Coordinate);
+        }
+
+        private async void SaveImageAsJpeg()  //Save picker and save function
+        {
+            FileSavePicker picker = new FileSavePicker();
+            picker.FileTypeChoices.Add("JPG File", new List<string>() { ".jpg" });
+            StorageFile file = await picker.PickSaveFileAsync();
+
+            if (file != null)
+            {
+                using (IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite))
                 {
-                    rootPage.NotifyUser("Error: " + err.Message, NotifyType.ErrorMessage);
-                    ResetPersistedState();
-                    ResetSessionState();
+                    BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, stream);
+                    Stream pixelStream = wBitmap.PixelBuffer.AsStream();
+                    byte[] pixels = new byte[pixelStream.Length];
+                    await pixelStream.ReadAsync(pixels, 0, pixels.Length);
+                    encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Ignore, (uint)wBitmap.PixelWidth, (uint)wBitmap.PixelHeight, 96.0, 96.0, pixels);
+                    await encoder.FlushAsync();
                 }
             }
         }
