@@ -30,26 +30,31 @@
         </Grid.RowDefinitions>
 
         <!-- Back button and page title -->
-        <Grid>
+        <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Height="120" Width="851" Margin="10,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="backButton" Margin="39,59,39,0" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
+            <Button x:Name="backButton" Margin="29,49,0,0" Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
                         Style="{StaticResource NavigationBackButtonNormalStyle}"
                         VerticalAlignment="Top"
                         AutomationProperties.Name="Back"
                         AutomationProperties.AutomationId="BackButton"
-                        AutomationProperties.ItemType="Navigation Button"/>
-            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
-                        IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,30,40"/>
+                        AutomationProperties.ItemType="Navigation Button" RenderTransformOrigin="0.402,0.427"/>
+            <TextBlock x:Name="pageTitle" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
+                        IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Bottom" Margin="0,0,0,31" HorizontalAlignment="Right" Width="721" Text="Remember this Moment"/>
         </Grid>
-        <Grid x:Name="test" HorizontalAlignment="Left" Height="608" Margin="10,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="1346">
-            <Grid x:Name="Output" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" MaxWidth="392" Height="598">
-                <Image x:Name="Photo" AutomationProperties.Name="A placeholder image" Stretch="Fill" Margin="2,0,-840,18" RenderTransformOrigin="0.598,0.473" Height="577" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="838" />
-            </Grid>
-            <TextBox HorizontalAlignment="Left" Margin="865,10,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="471"/>
-            <TextBlock HorizontalAlignment="Left" Margin="865,47,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="522" Width="442"/>
+        <Grid x:Name="test" HorizontalAlignment="Left" Height="588" Margin="30,0,0,30" VerticalAlignment="Bottom" Width="808" Grid.Row="1">
+            <Image x:Name="Photo" AutomationProperties.Name="A placeholder image" Stretch="Fill" Margin="10,0,0,10" RenderTransformOrigin="0.598,0.473" Height="568" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="788" />
         </Grid>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Right" Height="768" Margin="866,0,0,0" Width="500" Grid.RowSpan="2" Background="White">
+        	<Grid Margin="9">
+        		<TextBlock Margin="133,63,138,0" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap" Text="Enter description" VerticalAlignment="Top" Foreground="#FF44449C" SelectionHighlightColor="#FF34079E" FontSize="26.667" Height="34"/>
+        		<Rectangle Fill="#FF44449C" Height="5" Margin="65,102,65,0" Stroke="#FF44449C" VerticalAlignment="Top"/>
+        		<TextBox x:Name="Title" HorizontalAlignment="Left" Margin="65,154,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="350" Background="#FFD1BFBF" PlaceholderText="&quot;Title&quot;"/>
+        		<TextBox x:Name="Story" HorizontalAlignment="Left" Margin="65,191,0,70" TextWrapping="Wrap" Width="350" Background="#FFD1BFBF" PlaceholderText="&quot;Story&quot;"/>
+        		<Button Content="Save" HorizontalAlignment="Left" Margin="62,680,0,0" VerticalAlignment="Top" Background="Coral" Click="Button_Click"/>
+        	</Grid>
+        </Border>
     </Grid>
 </Page>

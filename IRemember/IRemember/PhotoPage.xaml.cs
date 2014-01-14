@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Storage;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -14,6 +15,13 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using System.Threading.Tasks;
+using Windows.UI.Popups;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.Graphics.Imaging;
+using Windows.Storage.Streams;
+using Windows.Storage.AccessCache;
+
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 
@@ -27,6 +35,9 @@ namespace IRemember
 
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
+        private BitmapImage textPassed;
+        StorageItemAccessList m_futureAccess = StorageApplicationPermissions.FutureAccessList;
+        string m_fileToken;
 
         /// <summary>
         /// This can be changed to a strongly typed view model.
@@ -104,5 +115,104 @@ namespace IRemember
         }
 
         #endregion
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (Title.Text == "")
+            {
+                var msgBox = new MessageDialog("Please enter a Title");
+                await msgBox.ShowAsync();
+            }
+            else if (Story.Text == "")
+            {
+                var msgBox = new MessageDialog("Please enter a Description");
+                await msgBox.ShowAsync();
+            }
+            else if (Title.Text != "" && Story.Text != "")
+            {
+                try
+                {
+                    StorageFile inputFile = await m_futureAccess.GetFileAsync(m_fileToken);
+                    StorageFile outputFile = await Helpers.GetFileFromSavePickerAsync();
+                    Guid encoderId;
+
+                    switch (outputFile.FileType)
+                    {
+                        case ".png":
+                            encoderId = BitmapEncoder.PngEncoderId;
+                            break;
+                        case ".bmp":
+                            encoderId = BitmapEncoder.BmpEncoderId;
+                            break;
+                        case ".jpg":
+                        default:
+                            encoderId = BitmapEncoder.JpegEncoderId;
+                            break;
+                    }
+
+                    using (IRandomAccessStream inputStream = await inputFile.OpenAsync(FileAccessMode.Read),
+                               outputStream = await outputFile.OpenAsync(FileAccessMode.ReadWrite))
+                    {
+                        // BitmapEncoder expects an empty output stream; the user may have selected a
+                        // pre-existing file.
+                        outputStream.Size = 0;
+
+                        // Get pixel data from the decoder. We apply the user-requested transforms on the
+                        // decoded pixels to take advantage of potential optimizations in the decoder.
+                        BitmapDecoder decoder = await BitmapDecoder.CreateAsync(inputStream);
+                        BitmapTransform transform = new BitmapTransform();
+
+                        // Scaling occurs before flip/rotation, therefore use the original dimensions
+                        // (no orientation applied) as parameters for scaling.
+                        transform.ScaledHeight = (uint)(decoder.PixelHeight * m_scaleFactor);
+                        transform.ScaledWidth = (uint)(decoder.PixelWidth * m_scaleFactor);
+                        transform.Rotation = Helpers.ConvertToBitmapRotation(m_userRotation);
+
+                        // Fant is a relatively high quality interpolation mode.
+                        transform.InterpolationMode = BitmapInterpolationMode.Fant;
+
+                        // The BitmapDecoder indicates what pixel format and alpha mode best match the
+                        // natively stored image data. This can provide a performance and/or quality gain.
+                        BitmapPixelFormat format = decoder.BitmapPixelFormat;
+                        BitmapAlphaMode alpha = decoder.BitmapAlphaMode;
+
+                        PixelDataProvider pixelProvider = await decoder.GetPixelDataAsync(
+                            format,
+                            alpha,
+                            transform,
+                            ExifOrientationMode.RespectExifOrientation,
+                            ColorManagementMode.ColorManageToSRgb
+                            );
+
+                        byte[] pixels = pixelProvider.DetachPixelData();
+
+                        // Write the pixel data onto the encoder. Note that we can't simply use the
+                        // BitmapTransform.ScaledWidth and ScaledHeight members as the user may have
+                        // requested a rotation (which is applied after scaling).
+                        BitmapEncoder encoder = await BitmapEncoder.CreateAsync(encoderId, outputStream);
+                        encoder.SetPixelData(
+                            format,
+                            alpha,
+                            (uint)((double)m_displayWidthNonScaled * m_scaleFactor),
+                            (uint)((double)m_displayHeightNonScaled * m_scaleFactor),
+                            decoder.DpiX,
+                            decoder.DpiY,
+                            pixels
+                            );
+
+                        await encoder.FlushAsync();
+
+                        rootPage.NotifyUser("Successfully saved a copy: " + outputFile.Name, NotifyType.StatusMessage);
+                    }
+                }
+                catch (Exception err)
+                {
+                    rootPage.NotifyUser("Error: " + err.Message, NotifyType.ErrorMessage);
+                    ResetPersistedState();
+                    ResetSessionState();
+                }
+            }
+        }
+
     }
 }
