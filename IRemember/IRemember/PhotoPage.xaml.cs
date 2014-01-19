@@ -137,6 +137,12 @@ namespace IRemember
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
+             if (newCollectionNameTextBox.Text != "")
+                {
+                    collectionComboBox.Items.RemoveAt(collectionComboBox.Items.Count - 1);
+                    collectionComboBox.Items.Add(newCollectionNameTextBox.Text);
+                    collectionComboBox.SelectedItem = newCollectionNameTextBox.Text;
+                }
             if (Title.Text == "")
             {
                 var msgBox = new MessageDialog("Please enter a title");
@@ -147,11 +153,12 @@ namespace IRemember
                 var msgBox = new MessageDialog("Please enter a description");
                 await msgBox.ShowAsync();
             }
-            else if (collectionComboBox.SelectedItem == newCollectionString && newCollectionNameTextBox.Text == "")
-            {
-                var msgBox = new MessageDialog("Please enter a collection name");
-                await msgBox.ShowAsync();
-            }
+             else if (collectionComboBox.SelectedItem == newCollectionString || collectionComboBox.SelectedIndex == -1)
+             {
+                 var msgBox = new MessageDialog("Please enter a collection name");
+                 await msgBox.ShowAsync();
+             }
+
             else if (Title.Text != "" && Story.Text != "") //all included check.
             {
                 if (file != null)
@@ -241,6 +248,7 @@ namespace IRemember
                 collectionComboBox.Items.RemoveAt(collectionComboBox.Items.Count - 1);
                 collectionComboBox.Items.Add(newCollectionNameTextBox.Text);
                 collectionComboBox.SelectedItem = newCollectionNameTextBox.Text;
+                Data.SampleDataSource.addGroup(new Data.SampleDataGroup(newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, "Assets/LightGray.png", newCollectionNameTextBox.Text));
             }
         }
 
