@@ -1,6 +1,7 @@
 ﻿using IRemember.Common;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
@@ -13,6 +14,7 @@ using Windows.Storage.Streams;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
@@ -32,6 +34,7 @@ namespace IRemember
         private BitmapImage bitmapimage;
         private WriteableBitmap wBitmap;
         private CancellationTokenSource _cts = null;
+        private string newCollectionString = "Add new collection...";
         StorageItemAccessList m_futureAccess = StorageApplicationPermissions.FutureAccessList;
         StorageFile file;
 
@@ -59,6 +62,18 @@ namespace IRemember
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.navigationHelper.SaveState += navigationHelper_SaveState;
+            loadCollectionComboBox();
+        }
+
+        private async void loadCollectionComboBox()
+        {
+            
+            IEnumerable<Data.SampleDataGroup> group = await Data.SampleDataSource.GetGroupsAsync();
+            foreach(Data.SampleDataGroup g in group)
+            {
+                collectionComboBox.Items.Add(g.Title);
+            }
+            collectionComboBox.Items.Add(newCollectionString);
         }
 
         protected async override void OnNavigatedTo(NavigationEventArgs e)
@@ -124,12 +139,17 @@ namespace IRemember
         {
             if (Title.Text == "")
             {
-                var msgBox = new MessageDialog("Please enter a Title");
+                var msgBox = new MessageDialog("Please enter a title");
                 await msgBox.ShowAsync();
             }
             else if (Story.Text == "")
             {
-                var msgBox = new MessageDialog("Please enter a Description");
+                var msgBox = new MessageDialog("Please enter a description");
+                await msgBox.ShowAsync();
+            }
+            else if (collectionComboBox.SelectedItem == newCollectionString && newCollectionNameTextBox.Text == "")
+            {
+                var msgBox = new MessageDialog("Please enter a collection name");
                 await msgBox.ShowAsync();
             }
             else if (Title.Text != "" && Story.Text != "") //all included check.
@@ -152,13 +172,18 @@ namespace IRemember
                             wBitmap.SetSource(stream);
                         }
 
-                        //SaveImageAsJpeg(); //Save picker and save function call {TODO} TURN BACK ON!
+                        SaveImageAsJpeg(); //Save picker and save function call {TODO} TURN BACK ON!
 
                         //get location
                         getLocation();
+
+                        
+
                     }
                 }
+            
             }
+
         }
 
         private async void getLocation()
@@ -188,6 +213,34 @@ namespace IRemember
                     encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Ignore, (uint)wBitmap.PixelWidth, (uint)wBitmap.PixelHeight, 96.0, 96.0, pixels);
                     await encoder.FlushAsync();
                 }
+            }
+        }
+
+        private void newGroup(string uniqueIdNewGroup, string titleNewGroup, string subtitleNewGroup, string imagePathNewGroup, string descriptionNewGroup)
+        {
+               //Data.SampleDataGroup group = await new Data.SampleDataGroup(uniqueIdNewGroup, titleNewGroup, subtitleNewGroup, imagePathNewGroup, descriptionNewGroup);       
+        }
+
+        private void collectionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (collectionComboBox.SelectedItem == newCollectionString)
+            {
+                newCollectionNameTextBox.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void newCollectionNameTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            //collectionComboBox.Item. newCollectionNameTextBox.Text;
+        }
+
+        private void newCollectionNameTextBox_KeyUp_1(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Enter)
+            {
+                collectionComboBox.Items.RemoveAt(collectionComboBox.Items.Count - 1);
+                collectionComboBox.Items.Add(newCollectionNameTextBox.Text);
+                collectionComboBox.SelectedItem = newCollectionNameTextBox.Text;
             }
         }
 
