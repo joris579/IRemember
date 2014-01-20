@@ -134,6 +134,7 @@
     <None Include="Common\ReadMe.txt" />
     <None Include="IRemember_TemporaryKey.pfx" />
     <Content Include="Assets\compact_camera.png" />
+    <Content Include="Assets\Pictures\SwagBoy94.jpg" />
     <Content Include="DataModel\SampleData.json" />
   </ItemGroup>
   <ItemGroup>

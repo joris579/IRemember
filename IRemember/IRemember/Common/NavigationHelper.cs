@@ -340,6 +340,7 @@ namespace IRemember.Common
             {
                 this.SaveState(this, new SaveStateEventArgs(pageState));
             }
+            frameState[_pageKey] = pageState;
         }
 
         #endregion

@@ -141,8 +141,11 @@ namespace IRemember
                 dialog.PhotoSettings.CroppedAspectRatio = aspectRatio;
 
                 StorageFile file = await dialog.CaptureFileAsync(CameraCaptureUIMode.Photo);
-                this.Frame.Navigate(typeof(PhotoPage), file);
-
+                if (file != null)
+                {
+                    this.Frame.Navigate(typeof(PhotoPage), file);
+                }
+                else return;
                 
             }
             catch (Exception ex)

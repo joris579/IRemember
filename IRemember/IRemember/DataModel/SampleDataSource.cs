@@ -168,7 +168,7 @@ namespace IRemember.Data
             JsonObject jsonObject = JsonObject.Parse(jsonText);
             jsonObject["Groups"].GetArray().Add(groupObject);
             string aap = jsonObject.Stringify();
-            //await Windows.Storage.FileIO.WriteTextAsync(file, jsonObject.Stringify()); 
+            await Windows.Storage.FileIO.WriteTextAsync(file, jsonObject.Stringify());
             //TODO
             //Fix Unauthorized Exeption so it will save the new group
         }
