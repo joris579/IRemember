@@ -152,7 +152,7 @@ namespace IRemember
                             wBitmap.SetSource(stream);
                         }
 
-                        //SaveImageAsJpeg(); //Save picker and save function call {TODO} TURN BACK ON!
+                        SaveImageAsJpeg(); //Save picker and save function call {TODO} TURN BACK ON!
 
                         //get location
                         getLocation();
@@ -168,7 +168,7 @@ namespace IRemember
             Geolocator locator = new Geolocator();
             Geoposition position = await locator.GetGeopositionAsync().AsTask(token);
 
-            System.Diagnostics.Debug.WriteLine("Test output" + position.Coordinate);
+            System.Diagnostics.Debug.WriteLine("Test output" + position.Coordinate.Longitude.ToString());
         }
 
         private async void SaveImageAsJpeg()  //Save picker and save function
