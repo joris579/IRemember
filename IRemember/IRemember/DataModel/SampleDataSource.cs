@@ -149,5 +149,28 @@ namespace IRemember.Data
                 this.Groups.Add(group);
             }
         }
+        public static async void addGroup(Data.SampleDataGroup group)
+        {
+            Uri dataUri = new Uri("ms-appx:///DataModel/SampleData.json");
+
+            JsonObject groupObject = new JsonObject();
+            groupObject.Add("UniqueId",JsonValue.CreateStringValue(group.UniqueId));
+            groupObject.Add("Title",JsonValue.CreateStringValue(group.Title));
+            groupObject.Add("Subtitle",JsonValue.CreateStringValue(group.Subtitle));
+            groupObject.Add("ImagePath",JsonValue.CreateStringValue(group.ImagePath));
+            groupObject.Add("Description",JsonValue.CreateStringValue(group.Description));
+
+            //groupObject.Add("Items",JsonArray.Parse(""));
+            string jsonGroupString = groupObject.Stringify();
+
+            StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
+            string jsonText = await FileIO.ReadTextAsync(file);
+            JsonObject jsonObject = JsonObject.Parse(jsonText);
+            jsonObject["Groups"].GetArray().Add(groupObject);
+            string aap = jsonObject.Stringify();
+            //await Windows.Storage.FileIO.WriteTextAsync(file, jsonObject.Stringify()); 
+            //TODO
+            //Fix Unauthorized Exeption so it will save the new group
+        }
     }
 }
