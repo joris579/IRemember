@@ -39,6 +39,7 @@ namespace IRemember
         private WriteableBitmap wBitmap;
         private CancellationTokenSource _cts = null;
         private string newCollectionString = "Add new collection...";
+        private string imageUri = "";
         StorageItemAccessList m_futureAccess = StorageApplicationPermissions.FutureAccessList;
         StorageFile file;
         Windows.Storage.StorageFolder localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
@@ -93,6 +94,7 @@ namespace IRemember
                 }
             }
             Photo.Source = bitmapimage;
+            imageUri = file.Path;
 
         }
         /// <summary>
@@ -187,19 +189,22 @@ namespace IRemember
                         SaveImageAsJpeg(); //Save picker and save function call {TODO} TURN BACK ON!
 
                         //get location lol no
-                        //getLocation();
+                        getLocation();
 
                         if(collectionComboBox.SelectedIndex == collectionComboBox.Items.Count-1)
                         {
                                 collectionComboBox.Items.RemoveAt(collectionComboBox.Items.Count - 1);
                                 collectionComboBox.Items.Add(newCollectionNameTextBox.Text);
                                 collectionComboBox.SelectedItem = newCollectionNameTextBox.Text;
-                                Data.SampleDataSource.addGroup(new Data.SampleDataGroup(newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, "Assets/LightGray.png", newCollectionNameTextBox.Text), new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, "Assets/LightGray.png", Story.Text, Story.Text));
+                                Data.SampleDataSource.addGroup(new Data.SampleDataGroup(newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, imageUri, newCollectionNameTextBox.Text), new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text));
                         }
                         else
                         {
-                            Data.SampleDataSource.addItem(new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, "Assets/LightGray.png", Story.Text, Story.Text), collectionComboBox.SelectedValue.ToString());
+                            Data.SampleDataSource.addItem(new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text), collectionComboBox.SelectedValue.ToString());
                         }
+
+                        //this.Frame.Navigate(typeof(MainPage));
+
 
                     }
                 }

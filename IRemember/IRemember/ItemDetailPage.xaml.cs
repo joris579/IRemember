@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bing.Maps;
 
-// The Item Detail Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234232
+// The Item Detail Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234232 lol like we give a crap yolo!
 
 namespace IRemember
 {
