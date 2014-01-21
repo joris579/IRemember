@@ -218,6 +218,7 @@ namespace IRemember
             FileSavePicker picker = new FileSavePicker();
             picker.FileTypeChoices.Add("JPG File", new List<string>() { ".jpg" });
             StorageFile file = await picker.PickSaveFileAsync();
+            System.Diagnostics.Debug.WriteLine(file.Path);
 
             if (file != null)
             {
