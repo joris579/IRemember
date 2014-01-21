@@ -24,7 +24,7 @@ namespace IRemember
         //getlocation
         private Geolocator _geolocator = null;
         private CancellationTokenSource _cts = null;
-
+        private Location location;
         /// <summary>   
         /// NavigationHelper is used on each page to aid in navigation and 
         /// process lifetime management
@@ -82,13 +82,9 @@ namespace IRemember
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+
             navigationHelper.OnNavigatedTo(e);
-            Pushpin pushpin = new Pushpin();
-            pushpin.Text = "1";
-            MapLayer.SetPosition(pushpin, new Location(46.849947, -121.32168));
-            map.Children.Add(pushpin);
-
-
+        
             //getlocation!
             getLocation();
 
@@ -100,7 +96,7 @@ namespace IRemember
             CancellationToken token = _cts.Token;
             Geolocator locator = new Geolocator();
             Geoposition pos = await locator.GetGeopositionAsync().AsTask(token);
-            Location location = new Location(pos.Coordinate.Latitude, pos.Coordinate.Longitude);
+            location = new Location(pos.Coordinate.Latitude, pos.Coordinate.Longitude);
             double zoomLevel = 13.0f;
 
             // if we have GPS level accuracy
@@ -116,6 +112,10 @@ namespace IRemember
                 zoomLevel = 14.0f;
             }
             map.SetView(location, zoomLevel);
+            Pushpin pushpin = new Pushpin();
+            pushpin.Text = "1";
+            MapLayer.SetPosition(pushpin, location);
+            map.Children.Add(pushpin);
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
