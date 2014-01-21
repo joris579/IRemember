@@ -1,18 +1,13 @@
-﻿using IRemember.Common;
+﻿using Bing.Maps;
+using IRemember.Common;
 using IRemember.Data;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.Devices.Geolocation;
+using System.Threading;
+using System.Threading.Tasks;
+using Bing.Maps;
 
 // The Item Detail Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234232
 
@@ -26,7 +21,11 @@ namespace IRemember
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
-        /// <summary>
+        //getlocation
+        private Geolocator _geolocator = null;
+        private CancellationTokenSource _cts = null;
+
+        /// <summary>   
         /// NavigationHelper is used on each page to aid in navigation and 
         /// process lifetime management
         /// </summary>
@@ -48,6 +47,7 @@ namespace IRemember
             this.InitializeComponent();
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += navigationHelper_LoadState;
+            _geolocator = new Geolocator();
         }
 
         /// <summary>
@@ -83,6 +83,39 @@ namespace IRemember
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
+            Pushpin pushpin = new Pushpin();
+            pushpin.Text = "1";
+            MapLayer.SetPosition(pushpin, new Location(46.849947, -121.32168));
+            map.Children.Add(pushpin);
+
+
+            //getlocation!
+            getLocation();
+
+        }
+
+        private async void getLocation()
+        {
+            _cts = new CancellationTokenSource();
+            CancellationToken token = _cts.Token;
+            Geolocator locator = new Geolocator();
+            Geoposition pos = await locator.GetGeopositionAsync().AsTask(token);
+            Location location = new Location(pos.Coordinate.Latitude, pos.Coordinate.Longitude);
+            double zoomLevel = 13.0f;
+
+            // if we have GPS level accuracy
+            if (pos.Coordinate.Accuracy <= 10)
+            {
+                // Add the 10m icon and zoom closer.
+                zoomLevel = 15.0f;
+            }
+            // Else if we have Wi-Fi level accuracy.
+            else if (pos.Coordinate.Accuracy <= 100)
+            {
+                // Add the 100m icon and zoom a little closer.
+                zoomLevel = 14.0f;
+            }
+            map.SetView(location, zoomLevel);
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
