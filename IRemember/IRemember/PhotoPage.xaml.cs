@@ -181,10 +181,20 @@ namespace IRemember
 
                         SaveImageAsJpeg(); //Save picker and save function call {TODO} TURN BACK ON!
 
-                        //get location
-                        getLocation();
+                        //get location lol no
+                        //getLocation();
 
-                        
+                        if(collectionComboBox.SelectedIndex == collectionComboBox.Items.Count-1)
+                        {
+                                collectionComboBox.Items.RemoveAt(collectionComboBox.Items.Count - 1);
+                                collectionComboBox.Items.Add(newCollectionNameTextBox.Text);
+                                collectionComboBox.SelectedItem = newCollectionNameTextBox.Text;
+                                Data.SampleDataSource.addGroup(new Data.SampleDataGroup(newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, "Assets/LightGray.png", newCollectionNameTextBox.Text), new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, "Assets/LightGray.png", Story.Text, Story.Text));
+                        }
+                        else
+                        {
+                            Data.SampleDataSource.addItem(new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, "Assets/LightGray.png", Story.Text, Story.Text), collectionComboBox.SelectedValue.ToString());
+                        }
 
                     }
                 }
@@ -243,13 +253,7 @@ namespace IRemember
 
         private void newCollectionNameTextBox_KeyUp_1(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
-            {
-                collectionComboBox.Items.RemoveAt(collectionComboBox.Items.Count - 1);
-                collectionComboBox.Items.Add(newCollectionNameTextBox.Text);
-                collectionComboBox.SelectedItem = newCollectionNameTextBox.Text;
-                Data.SampleDataSource.addGroup(new Data.SampleDataGroup(newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, "Assets/LightGray.png", newCollectionNameTextBox.Text));
-            }
+           
         }
 
     }
