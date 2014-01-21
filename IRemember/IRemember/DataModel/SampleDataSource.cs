@@ -120,9 +120,10 @@ namespace IRemember.Data
             if (this._groups.Count != 0)
                 return;
 
-            Uri dataUri = new Uri("ms-appx:///DataModel/SampleData.json");
+            Uri dataUri = new Uri("ms-appdata:///local/Data.json");
 
             StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
+            file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
             string jsonText = await FileIO.ReadTextAsync(file);
             JsonObject jsonObject = JsonObject.Parse(jsonText);
             JsonArray jsonArray = jsonObject["Groups"].GetArray();
@@ -148,9 +149,9 @@ namespace IRemember.Data
                 }
                 this.Groups.Add(group);            }
         }
-        public static async void addGroup(Data.SampleDataGroup group)
+        public static async void addGroup(Data.SampleDataGroup group, Data.SampleDataItem item)
         {
-            Uri dataUri = new Uri("ms-appx:///DataModel/SampleData.json");
+            Uri dataUri = new Uri("ms-appdata:///local/Data.json");
 
             JsonObject groupObject = new JsonObject();
             groupObject.Add("UniqueId",JsonValue.CreateStringValue(group.UniqueId));
@@ -158,18 +159,61 @@ namespace IRemember.Data
             groupObject.Add("Subtitle",JsonValue.CreateStringValue(group.Subtitle));
             groupObject.Add("ImagePath",JsonValue.CreateStringValue(group.ImagePath));
             groupObject.Add("Description",JsonValue.CreateStringValue(group.Description));
-
-            //groupObject.Add("Items",JsonArray.Parse(""));
+            JsonArray jsonArray = new JsonArray();
+            JsonObject itemObject = new JsonObject();
+            itemObject.Add("UniqueId", JsonValue.CreateStringValue(item.UniqueId));
+            itemObject.Add("Title", JsonValue.CreateStringValue(item.Title));
+            itemObject.Add("Subtitle", JsonValue.CreateStringValue(item.Subtitle));
+            itemObject.Add("ImagePath", JsonValue.CreateStringValue(item.ImagePath));
+            itemObject.Add("Description", JsonValue.CreateStringValue(item.Description));
+            itemObject.Add("Content", JsonValue.CreateStringValue(item.Content));
+            jsonArray.Add(itemObject);
+            groupObject.Add("Items",jsonArray);
             string jsonGroupString = groupObject.Stringify();
 
             StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
             string jsonText = await FileIO.ReadTextAsync(file);
             JsonObject jsonObject = JsonObject.Parse(jsonText);
+
             jsonObject["Groups"].GetArray().Add(groupObject);
-            string aap = jsonObject.Stringify();
-            await Windows.Storage.FileIO.WriteTextAsync(file, jsonObject.Stringify());
-            //TODO
+       
+            await Windows.Storage.FileIO.WriteTextAsync(file, jsonObject.Stringify()); 
+            //TODO Stom van me let me, jaja. ik zie het al. dat bestnad heropenen terwijl hij er al is, gekke shit man
             //Fix Unauthorized Exeption so it will save the new group
+        }
+        public static async void addItem(Data.SampleDataItem item, string groupName)
+        {
+            Uri dataUri = new Uri("ms-appdata:///local/Data.json");
+
+            JsonObject itemObject = new JsonObject();
+            itemObject.Add("UniqueId", JsonValue.CreateStringValue(item.UniqueId));
+            itemObject.Add("Title", JsonValue.CreateStringValue(item.Title));
+            itemObject.Add("Subtitle", JsonValue.CreateStringValue(item.Subtitle));
+            itemObject.Add("ImagePath", JsonValue.CreateStringValue(item.ImagePath));
+            itemObject.Add("Description", JsonValue.CreateStringValue(item.Description));
+            itemObject.Add("Content", JsonValue.CreateStringValue(item.Content));
+            
+
+            StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
+            file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
+            string jsonText = await FileIO.ReadTextAsync(file);
+            JsonObject jsonObject = JsonObject.Parse(jsonText);
+            JsonArray jsonArray = jsonObject["Groups"].GetArray();
+
+
+            foreach (JsonValue groupValue in jsonArray)
+            {
+                JsonObject jObj = groupValue.GetObject();
+                if (groupName == jObj["Title"].GetString())
+                {
+                    jObj["Items"].GetArray().Add(itemObject);
+                    break;
+                }
+
+            }
+            jsonObject["Groups"] = jsonArray;
+            await Windows.Storage.FileIO.WriteTextAsync(file, jsonObject.Stringify()); 
+
         }
     }
 }
