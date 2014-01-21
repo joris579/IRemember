@@ -146,8 +146,7 @@ namespace IRemember.Data
                                                        itemObject["Description"].GetString(),
                                                        itemObject["Content"].GetString()));
                 }
-                this.Groups.Add(group);
-            }
+                this.Groups.Add(group);            }
         }
         public static async void addGroup(Data.SampleDataGroup group)
         {

@@ -17,6 +17,10 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using Windows.Devices.Geolocation;
+using System.Threading;
+using System.Threading.Tasks;
+using Bing.Maps;
 
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
@@ -37,6 +41,7 @@ namespace IRemember
         private string newCollectionString = "Add new collection...";
         StorageItemAccessList m_futureAccess = StorageApplicationPermissions.FutureAccessList;
         StorageFile file;
+        Windows.Storage.StorageFolder localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
 
         /// <summary>
         /// This can be changed to a strongly typed view model.
@@ -205,23 +210,7 @@ namespace IRemember
 
         private async void SaveImageAsJpeg()  //Save picker and save function
         {
-            FileSavePicker picker = new FileSavePicker();
-            picker.FileTypeChoices.Add("JPG File", new List<string>() { ".jpg" });
-            StorageFile file = await picker.PickSaveFileAsync();
-            System.Diagnostics.Debug.WriteLine(file.Path);
-
-            if (file != null)
-            {
-                using (IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite))
-                {
-                    BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, stream);
-                    Stream pixelStream = wBitmap.PixelBuffer.AsStream();
-                    byte[] pixels = new byte[pixelStream.Length];
-                    await pixelStream.ReadAsync(pixels, 0, pixels.Length);
-                    encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Ignore, (uint)wBitmap.PixelWidth, (uint)wBitmap.PixelHeight, 96.0, 96.0, pixels);
-                    await encoder.FlushAsync();
-                }
-            }
+               
         }
 
         private void newGroup(string uniqueIdNewGroup, string titleNewGroup, string subtitleNewGroup, string imagePathNewGroup, string descriptionNewGroup)

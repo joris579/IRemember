@@ -35,7 +35,7 @@ namespace IRemember
         private Windows.Foundation.Collections.IPropertySet appSettings;
         private const String photoKey = "capturedPhoto";
         BitmapImage bitmapimage;
-        
+
 
         /// <summary>
         /// NavigationHelper is used on each page to aid in navigation and 
@@ -146,13 +146,13 @@ namespace IRemember
                     this.Frame.Navigate(typeof(PhotoPage), file);
                 }
                 else return;
-                
+
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex);
             }
         }
-
     }
 }
+       
