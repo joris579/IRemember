@@ -103,6 +103,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <Folder Include="Assets\Pictures\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
@@ -134,7 +135,6 @@
     <None Include="Common\ReadMe.txt" />
     <None Include="IRemember_TemporaryKey.pfx" />
     <Content Include="Assets\compact_camera.png" />
-    <Content Include="Assets\Pictures\SwagBoy94.jpg" />
     <Content Include="DataModel\SampleData.json" />
   </ItemGroup>
   <ItemGroup>
