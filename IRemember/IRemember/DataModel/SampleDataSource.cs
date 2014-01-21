@@ -23,7 +23,7 @@ namespace IRemember.Data
     /// </summary>
     public class SampleDataItem
     {
-        public SampleDataItem(String uniqueId, String title, String subtitle, String imagePath, String description, String content)
+        public SampleDataItem(String uniqueId, String title, String subtitle, String imagePath, String description, String content, String longitude, String latidude)
         {
             this.UniqueId = uniqueId;
             this.Title = title;
@@ -31,6 +31,8 @@ namespace IRemember.Data
             this.Description = description;
             this.ImagePath = imagePath;
             this.Content = content;
+            this.Longitude = longitude;
+            this.Latitude = latidude;
         }
 
         public string UniqueId { get; private set; }
@@ -39,6 +41,8 @@ namespace IRemember.Data
         public string Description { get; private set; }
         public string ImagePath { get; private set; }
         public string Content { get; private set; }
+        public string Longitude { get; private set; }
+        public string Latitude { get; private set; }
 
         public override string ToString()
         {
@@ -145,7 +149,9 @@ namespace IRemember.Data
                                                        itemObject["Subtitle"].GetString(),
                                                        itemObject["ImagePath"].GetString(),
                                                        itemObject["Description"].GetString(),
-                                                       itemObject["Content"].GetString()));
+                                                       itemObject["Content"].GetString(),
+                                                       itemObject["Longitude"].GetString(),
+                                                       itemObject["Latitude"].GetString()));
                 }
                 this.Groups.Add(group);            }
         }
@@ -192,6 +198,8 @@ namespace IRemember.Data
             itemObject.Add("ImagePath", JsonValue.CreateStringValue(item.ImagePath));
             itemObject.Add("Description", JsonValue.CreateStringValue(item.Description));
             itemObject.Add("Content", JsonValue.CreateStringValue(item.Content));
+            itemObject.Add("Longitude", JsonValue.CreateStringValue(item.Longitude));
+            itemObject.Add("Latitude", JsonValue.CreateStringValue(item.Latitude));
             
 
             StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
@@ -200,7 +208,7 @@ namespace IRemember.Data
             JsonObject jsonObject = JsonObject.Parse(jsonText);
             JsonArray jsonArray = jsonObject["Groups"].GetArray();
 
-
+            
             foreach (JsonValue groupValue in jsonArray)
             {
                 JsonObject jObj = groupValue.GetObject();

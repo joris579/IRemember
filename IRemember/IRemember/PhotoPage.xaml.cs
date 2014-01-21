@@ -40,6 +40,7 @@ namespace IRemember
         private CancellationTokenSource _cts = null;
         private string newCollectionString = "Add new collection...";
         private string imageUri = "";
+        private Geoposition position = null;
         StorageItemAccessList m_futureAccess = StorageApplicationPermissions.FutureAccessList;
         StorageFile file;
         Windows.Storage.StorageFolder localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
@@ -160,7 +161,7 @@ namespace IRemember
                 var msgBox = new MessageDialog("Please enter a description");
                 await msgBox.ShowAsync();
             }
-             else if (collectionComboBox.SelectedItem == newCollectionString || collectionComboBox.SelectedIndex == -1)
+             else if (collectionComboBox.SelectedItem.Equals(newCollectionString) || collectionComboBox.SelectedIndex == -1)
              {
                  var msgBox = new MessageDialog("Please enter a collection name");
                  await msgBox.ShowAsync();
@@ -188,19 +189,34 @@ namespace IRemember
 
                         SaveImageAsJpeg(); //Save picker and save function call {TODO} TURN BACK ON!
 
-                        //get location lol no
+                        //get location lol ok
                         getLocation();
 
-                        if(collectionComboBox.SelectedIndex == collectionComboBox.Items.Count-1)
+                        if (collectionComboBox.SelectedIndex == collectionComboBox.Items.Count - 1)
                         {
-                                collectionComboBox.Items.RemoveAt(collectionComboBox.Items.Count - 1);
-                                collectionComboBox.Items.Add(newCollectionNameTextBox.Text);
-                                collectionComboBox.SelectedItem = newCollectionNameTextBox.Text;
-                                Data.SampleDataSource.addGroup(new Data.SampleDataGroup(newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, imageUri, newCollectionNameTextBox.Text), new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text));
+                            collectionComboBox.Items.RemoveAt(collectionComboBox.Items.Count - 1);
+                            collectionComboBox.Items.Add(newCollectionNameTextBox.Text);
+                            collectionComboBox.SelectedItem = newCollectionNameTextBox.Text;
+                            if (position == null)
+                            {
+                                Data.SampleDataSource.addGroup(new Data.SampleDataGroup(newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, imageUri, newCollectionNameTextBox.Text), new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text, "123456", "123456"));
+                            }
+                            else
+                            {
+                                Data.SampleDataSource.addGroup(new Data.SampleDataGroup(newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, imageUri, newCollectionNameTextBox.Text), new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text, position.Coordinate.Latitude.ToString(), position.Coordinate.Longitude.ToString()));
+                            }
+                            
                         }
                         else
                         {
-                            Data.SampleDataSource.addItem(new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text), collectionComboBox.SelectedValue.ToString());
+                            if (position == null)
+                            {
+                                Data.SampleDataSource.addItem(new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text, "123456", "123456"),collectionComboBox.SelectedValue.ToString());
+                            }
+                            else
+                            {
+                                Data.SampleDataSource.addItem(new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text, position.Coordinate.Latitude.ToString(), position.Coordinate.Longitude.ToString()), collectionComboBox.SelectedValue.ToString());
+                            }
                         }
 
                         //this.Frame.Navigate(typeof(MainPage));
@@ -218,7 +234,7 @@ namespace IRemember
             _cts = new CancellationTokenSource();
             CancellationToken token = _cts.Token;
             Geolocator locator = new Geolocator();
-            Geoposition position = await locator.GetGeopositionAsync().AsTask(token);
+            position = await locator.GetGeopositionAsync().AsTask(token);
 
             System.Diagnostics.Debug.WriteLine("Test output" + position.Coordinate.Longitude.ToString());
         }
