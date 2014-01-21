@@ -102,13 +102,11 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-<<<<<<< HEAD
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <Folder Include="Assets\Pictures\" />
   </ItemGroup>
   <ItemGroup>
-=======
->>>>>>> 1d85c2cd4ff8c60bc7ea37572f299a68ebd7c8c2
+
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
