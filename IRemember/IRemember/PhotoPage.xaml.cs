@@ -1,6 +1,7 @@
 ﻿using IRemember.Common;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using Windows.Devices.Geolocation;
 using Windows.Storage;
@@ -179,6 +180,9 @@ namespace IRemember
                         }
                         //get location lol ok
 
+                        //generate random unique ID 2 times in case a new group is created ;) 
+
+                        
 
                         if (collectionComboBox.SelectedIndex == collectionComboBox.Items.Count - 1)
                         {
@@ -187,11 +191,11 @@ namespace IRemember
                             collectionComboBox.SelectedItem = newCollectionNameTextBox.Text;
                             if (position == null)
                             {
-                                Data.SampleDataSource.addGroup(new Data.SampleDataGroup(newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, imageUri, newCollectionNameTextBox.Text), new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text, "123456", "123456"));
+                                Data.SampleDataSource.addGroup(new Data.SampleDataGroup(GetRandomString(), newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, imageUri, newCollectionNameTextBox.Text), new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text, "123456", "123456"));
                             }
                             else
                             {
-                                Data.SampleDataSource.addGroup(new Data.SampleDataGroup(newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, imageUri, newCollectionNameTextBox.Text), new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text, position.Coordinate.Latitude.ToString(), position.Coordinate.Longitude.ToString()));
+                                Data.SampleDataSource.addGroup(new Data.SampleDataGroup(GetRandomString(), newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, imageUri, newCollectionNameTextBox.Text), new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text, position.Coordinate.Latitude.ToString(), position.Coordinate.Longitude.ToString()));
                             }
 
                         }
@@ -199,24 +203,28 @@ namespace IRemember
                         {
                             if (position == null)
                             {
-                                Data.SampleDataSource.addItem(new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text, "123456", "123456"), collectionComboBox.SelectedValue.ToString());
+                                Data.SampleDataSource.addItem(new Data.SampleDataItem(GetRandomString(), Title.Text, Story.Text, imageUri, Story.Text, Story.Text, "123456", "123456"), collectionComboBox.SelectedValue.ToString());
                             }
                             else
                             {
-                                Data.SampleDataSource.addItem(new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text, position.Coordinate.Latitude.ToString(), position.Coordinate.Longitude.ToString()), collectionComboBox.SelectedValue.ToString());
+                                Data.SampleDataSource.addItem(new Data.SampleDataItem(GetRandomString(), Title.Text, Story.Text, imageUri, Story.Text, Story.Text, position.Coordinate.Latitude.ToString(), position.Coordinate.Longitude.ToString()), collectionComboBox.SelectedValue.ToString());
                             }
                         }
 
                         //this.Frame.Navigate(typeof(MainPage));
-
-
+                        
                     }
                 }
 
             }
 
         }
-
+        public static string GetRandomString()
+        {
+            string path = Path.GetRandomFileName();
+            path = path.Replace(".", ""); // Remove period.
+            return path;
+        }
         private async void getLocation()
         {
             _cts = new CancellationTokenSource();

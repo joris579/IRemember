@@ -58,9 +58,14 @@ namespace IRemember
         /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
         /// a dictionary of state preserved by this page during an earlier
         /// session.  The state will be null the first time a page is visited.</param>
-        private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
+        private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
             // TODO: Create an appropriate data model for your problem domain to replace the sample data
+            initializePage();
+        }
+
+        public async void initializePage()
+        {
             var sampleDataGroups = await SampleDataSource.GetGroupsAsync();
             this.DefaultViewModel["Groups"] = sampleDataGroups;
         }
@@ -107,6 +112,7 @@ namespace IRemember
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            initializePage();
             navigationHelper.OnNavigatedTo(e);
         }
 
