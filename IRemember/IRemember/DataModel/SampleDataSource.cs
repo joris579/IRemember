@@ -96,6 +96,7 @@ namespace IRemember.Data
 
         public static async Task<IEnumerable<SampleDataGroup>> GetGroupsAsync()
         {
+            
             await _sampleDataSource.GetSampleDataAsync();
 
             return _sampleDataSource.Groups;
@@ -122,7 +123,9 @@ namespace IRemember.Data
         private async Task GetSampleDataAsync()
         {
             if (this._groups.Count != 0)
-                return;
+            {
+                _groups.Clear();
+            }
 
             Uri dataUri = new Uri("ms-appdata:///local/Data.json");
 
