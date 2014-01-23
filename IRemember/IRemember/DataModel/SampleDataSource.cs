@@ -153,7 +153,8 @@ namespace IRemember.Data
                                                        itemObject["Longitude"].GetString(),
                                                        itemObject["Latitude"].GetString()));
                 }
-                this.Groups.Add(group);            }
+                this.Groups.Add(group);            
+            }
         }
         public static async void addGroup(Data.SampleDataGroup group, Data.SampleDataItem item)
         {
@@ -173,8 +174,10 @@ namespace IRemember.Data
             itemObject.Add("ImagePath", JsonValue.CreateStringValue(item.ImagePath));
             itemObject.Add("Description", JsonValue.CreateStringValue(item.Description));
             itemObject.Add("Content", JsonValue.CreateStringValue(item.Content));
+            itemObject.Add("Longitude", JsonValue.CreateStringValue(item.Longitude));
+            itemObject.Add("Latitude", JsonValue.CreateStringValue(item.Latitude));
             jsonArray.Add(itemObject);
-            groupObject.Add("Items",jsonArray);
+            groupObject.Add("Items", jsonArray);
             string jsonGroupString = groupObject.Stringify();
 
             StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);

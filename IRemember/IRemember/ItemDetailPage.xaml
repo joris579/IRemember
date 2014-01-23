@@ -36,7 +36,13 @@
         -->
         <Grid Grid.Row="1" x:Name="contentRegion" Background="Coral">
             <Grid HorizontalAlignment="Left" Height="608" Margin="10,10,0,0" VerticalAlignment="Top" Width="1346" Background="Coral">
-                <bm:Map x:Name="map" Credentials="Aog7-BCyGHYowZb9SF-WlZM6mLOSp1tHH2NA75Z5yx9XJAoccTT9tzLshYuqzzP9" HorizontalAlignment="Left" Margin="425,10,0,0" VerticalAlignment="Top" Height="588" Width="911"/>
+                <bm:Map x:Name="map" Credentials="Aog7-BCyGHYowZb9SF-WlZM6mLOSp1tHH2NA75Z5yx9XJAoccTT9tzLshYuqzzP9" HorizontalAlignment="Left" Margin="659,10,0,0" VerticalAlignment="Top" Height="588" Width="677"/>
+                <Image Source="{Binding ImagePath}" x:Name="Image" HorizontalAlignment="Left" Height="391" Margin="10,10,0,0" VerticalAlignment="Top" Width="625"/>
+                <TextBlock Text="{Binding Subtitle}" x:Name="text" HorizontalAlignment="Left" Margin="10,416,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="625" Height="182" FontSize="18.667">
+                	<Run/>
+                	<LineBreak/>
+                	<Run/>
+                </TextBlock>
             </Grid>
         </Grid>
 

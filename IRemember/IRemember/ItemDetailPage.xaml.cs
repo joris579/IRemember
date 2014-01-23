@@ -7,7 +7,6 @@ using Windows.UI.Xaml.Navigation;
 using Windows.Devices.Geolocation;
 using System.Threading;
 using System.Threading.Tasks;
-using Bing.Maps;
 
 // The Item Detail Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234232 lol like we give a crap yolo!
 
@@ -20,6 +19,7 @@ namespace IRemember
     {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
+        private SampleDataItem item;
 
         //getlocation
         private Geolocator _geolocator = null;
@@ -64,7 +64,7 @@ namespace IRemember
         private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
             // TODO: Create an appropriate data model for your problem domain to replace the sample data
-            var item = await SampleDataSource.GetItemAsync((String)e.NavigationParameter);
+            item = await SampleDataSource.GetItemAsync((String)e.NavigationParameter);
             this.DefaultViewModel["Item"] = item;
         }
 
@@ -96,7 +96,8 @@ namespace IRemember
             CancellationToken token = _cts.Token;
             Geolocator locator = new Geolocator();
             Geoposition pos = await locator.GetGeopositionAsync().AsTask(token);
-            location = new Location(pos.Coordinate.Latitude, pos.Coordinate.Longitude);
+            location = new Location(Double.Parse(item.Longitude) ,Double.Parse(item.Latitude));
+            System.Diagnostics.Debug.WriteLine(location.Latitude.ToString() + " " + location.Longitude.ToString());
             double zoomLevel = 13.0f;
 
             // if we have GPS level accuracy

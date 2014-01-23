@@ -1,26 +1,16 @@
 ﻿using IRemember.Common;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using Windows.Devices.Geolocation;
-using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
-using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
-using Windows.Devices.Geolocation;
-using System.Threading;
-using System.Threading.Tasks;
-using Bing.Maps;
 
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
@@ -70,13 +60,14 @@ namespace IRemember
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.navigationHelper.SaveState += navigationHelper_SaveState;
             loadCollectionComboBox();
+            getLocation();
         }
 
         private async void loadCollectionComboBox()
         {
-            
+
             IEnumerable<Data.SampleDataGroup> group = await Data.SampleDataSource.GetGroupsAsync();
-            foreach(Data.SampleDataGroup g in group)
+            foreach (Data.SampleDataGroup g in group)
             {
                 collectionComboBox.Items.Add(g.Title);
             }
@@ -145,12 +136,12 @@ namespace IRemember
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-             if (newCollectionNameTextBox.Text != "")
-                {
-                    collectionComboBox.Items.RemoveAt(collectionComboBox.Items.Count - 1);
-                    collectionComboBox.Items.Add(newCollectionNameTextBox.Text);
-                    collectionComboBox.SelectedItem = newCollectionNameTextBox.Text;
-                }
+            if (newCollectionNameTextBox.Text != "")
+            {
+                collectionComboBox.Items.RemoveAt(collectionComboBox.Items.Count - 1);
+                collectionComboBox.Items.Add(newCollectionNameTextBox.Text);
+                collectionComboBox.SelectedItem = newCollectionNameTextBox.Text;
+            }
             if (Title.Text == "")
             {
                 var msgBox = new MessageDialog("Please enter a title");
@@ -161,11 +152,11 @@ namespace IRemember
                 var msgBox = new MessageDialog("Please enter a description");
                 await msgBox.ShowAsync();
             }
-             else if (collectionComboBox.SelectedItem.Equals(newCollectionString) || collectionComboBox.SelectedIndex == -1)
-             {
-                 var msgBox = new MessageDialog("Please enter a collection name");
-                 await msgBox.ShowAsync();
-             }
+            else if (collectionComboBox.SelectedItem.Equals(newCollectionString) || collectionComboBox.SelectedIndex == -1)
+            {
+                var msgBox = new MessageDialog("Please enter a collection name");
+                await msgBox.ShowAsync();
+            }
 
             else if (Title.Text != "" && Story.Text != "") //all included check.
             {
@@ -186,11 +177,8 @@ namespace IRemember
                         {
                             wBitmap.SetSource(stream);
                         }
-
-                        SaveImageAsJpeg(); //Save picker and save function call {TODO} TURN BACK ON!
-
                         //get location lol ok
-                        getLocation();
+
 
                         if (collectionComboBox.SelectedIndex == collectionComboBox.Items.Count - 1)
                         {
@@ -205,13 +193,13 @@ namespace IRemember
                             {
                                 Data.SampleDataSource.addGroup(new Data.SampleDataGroup(newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, newCollectionNameTextBox.Text, imageUri, newCollectionNameTextBox.Text), new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text, position.Coordinate.Latitude.ToString(), position.Coordinate.Longitude.ToString()));
                             }
-                            
+
                         }
                         else
                         {
                             if (position == null)
                             {
-                                Data.SampleDataSource.addItem(new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text, "123456", "123456"),collectionComboBox.SelectedValue.ToString());
+                                Data.SampleDataSource.addItem(new Data.SampleDataItem(Title.Text, Title.Text, Story.Text, imageUri, Story.Text, Story.Text, "123456", "123456"), collectionComboBox.SelectedValue.ToString());
                             }
                             else
                             {
@@ -224,7 +212,7 @@ namespace IRemember
 
                     }
                 }
-            
+
             }
 
         }
@@ -235,18 +223,14 @@ namespace IRemember
             CancellationToken token = _cts.Token;
             Geolocator locator = new Geolocator();
             position = await locator.GetGeopositionAsync().AsTask(token);
-
-            System.Diagnostics.Debug.WriteLine("Test output" + position.Coordinate.Longitude.ToString());
-        }
-
-        private async void SaveImageAsJpeg()  //Save picker and save function
-        {
-               
+            System.Diagnostics.Debug.WriteLine(position);
+            MessageDialog dialog = new MessageDialog(position.Coordinate.Latitude.ToString());
+            await dialog.ShowAsync();
         }
 
         private void newGroup(string uniqueIdNewGroup, string titleNewGroup, string subtitleNewGroup, string imagePathNewGroup, string descriptionNewGroup)
         {
-               //Data.SampleDataGroup group = await new Data.SampleDataGroup(uniqueIdNewGroup, titleNewGroup, subtitleNewGroup, imagePathNewGroup, descriptionNewGroup);       
+            //Data.SampleDataGroup group = await new Data.SampleDataGroup(uniqueIdNewGroup, titleNewGroup, subtitleNewGroup, imagePathNewGroup, descriptionNewGroup);       
         }
 
         private void collectionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -264,7 +248,7 @@ namespace IRemember
 
         private void newCollectionNameTextBox_KeyUp_1(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
-           
+
         }
 
     }

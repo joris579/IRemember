@@ -1,25 +1,13 @@
 ﻿using IRemember.Common;
 using IRemember.Data;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using Windows.Media.Capture;
 using Windows.Storage;
-using Windows.Storage.AccessCache;
-using Windows.Storage.Streams;
-using Windows.UI.Xaml.Media.Imaging;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Navigation;
 
 // The Grouped Items Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234231
 
@@ -32,9 +20,7 @@ namespace IRemember
     {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
-        private Windows.Foundation.Collections.IPropertySet appSettings;
         private const String photoKey = "capturedPhoto";
-        BitmapImage bitmapimage;
 
 
         /// <summary>
@@ -155,4 +141,3 @@ namespace IRemember
         }
     }
 }
-       
