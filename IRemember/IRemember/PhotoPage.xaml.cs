@@ -210,9 +210,7 @@ namespace IRemember
                                 Data.SampleDataSource.addItem(new Data.SampleDataItem(GetRandomString(), Title.Text, Story.Text, imageUri, Story.Text, Story.Text, position.Coordinate.Latitude.ToString(), position.Coordinate.Longitude.ToString()), collectionComboBox.SelectedValue.ToString());
                             }
                         }
-
-                        //this.Frame.Navigate(typeof(MainPage));
-                        
+                        this.Frame.Navigate(typeof(MainPage));
                     }
                 }
 
@@ -231,9 +229,6 @@ namespace IRemember
             CancellationToken token = _cts.Token;
             Geolocator locator = new Geolocator();
             position = await locator.GetGeopositionAsync().AsTask(token);
-            System.Diagnostics.Debug.WriteLine(position);
-            MessageDialog dialog = new MessageDialog(position.Coordinate.Latitude.ToString());
-            await dialog.ShowAsync();
         }
 
         private void newGroup(string uniqueIdNewGroup, string titleNewGroup, string subtitleNewGroup, string imagePathNewGroup, string descriptionNewGroup)
