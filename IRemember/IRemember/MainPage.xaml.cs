@@ -108,6 +108,7 @@ namespace IRemember
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
+            this.InitializeComponent();
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
