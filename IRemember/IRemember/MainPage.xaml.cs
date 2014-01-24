@@ -61,10 +61,14 @@ namespace IRemember
         private async void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
             // TODO: Create an appropriate data model for your problem domain to replace the sample data
+            reloadData();
+        }
+
+        private async void reloadData()
+        {
             var sampleDataGroups = await SampleDataSource.GetGroupsAsync();
             this.DefaultViewModel["Groups"] = sampleDataGroups;
         }
-
         /// <summary>
         /// Invoked when a group header is clicked.
         /// </summary>
@@ -108,7 +112,6 @@ namespace IRemember
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
-            res
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
